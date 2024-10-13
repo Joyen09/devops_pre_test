@@ -1,6 +1,6 @@
 # 客戶數據管理系統
 
-這是一個基於 Go、React 和 MariaDB 的全棧應用程序，用於管理客戶數據和交易記錄。該項目包括自動化的 CI/CD 流程和 Kubernetes 部署配置。
+這是一個基於 Go、React 和 MariaDB的應用，用於管理客戶資料和交易記錄。該項目包括自動化的 CI/CD 流程和 Kubernetes 部署配置。
 
 ## 功能特點
 
@@ -15,7 +15,7 @@
 
 - 後端：Go (Gin 框架)
 - 前端：React
-- 數據庫：MariaDB
+- 資料庫：MariaDB
 - 容器化：Docker & Docker Compose
 - CI/CD：GitHub Actions
 - 容器編排：Kubernetes
