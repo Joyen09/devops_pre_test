@@ -46,13 +46,24 @@ function App() {
             const response = await axios.get(`${API_BASE_URL}/api/customers/${id}/transactions`, {
                 params: { start_date: startDate, end_date: endDate },
             });
-            if (response.data.length === 0) {
-                toast.info('所選日期範圍內沒有交易記錄');
+            if (response.data === null) {
+                console.log('No transactions found or error occurred');
+                toast.info('在所選日期範圍內沒有找到交易記錄，或發生了錯誤');
+                setTransactions([]);
+            } else if (Array.isArray(response.data)) {
+                if (response.data.length === 0) {
+                    toast.info('所選日期範圍內沒有交易記錄');
+                }
+                setTransactions(response.data);
+            } else {
+                console.error('Unexpected response format:', response.data);
+                toast.error('獲取交易記錄失敗：數據格式錯誤');
+                setTransactions([]);
             }
-            setTransactions(response.data);
         } catch (error) {
             console.error('Error fetching transactions:', error);
             toast.error('獲取交易記錄失敗');
+            setTransactions([]);
         }
     };
 
@@ -235,7 +246,7 @@ function App() {
                     <button onClick={handleUpdateCustomer}>更新客戶資料</button>
                     <p>過去一年交易總額: {selectedCustomer.total_amount_last_year}</p>
 
-                    <h3>交易記錄</h3>
+                    <h3>交易記錄 - {selectedCustomer.customer.name} (ID: {selectedCustomer.customer.id})</h3>
                     <input
                         type="date"
                         value={startDate}
@@ -249,14 +260,18 @@ function App() {
                     <button onClick={() => fetchCustomerTransactions(selectedCustomer.customer.id)}>
                         查詢交易
                     </button>
-                    <ul>
-                        {transactions.map(transaction => (
-                            <li key={transaction.id}>
-                                日期：{new Date(transaction.transaction_date).toLocaleDateString()} -
-                                金額：{transaction.borrow_fee}
-                            </li>
-                        ))}
-                    </ul>
+                    {transactions && transactions.length > 0 ? (
+                        <ul>
+                            {transactions.map(transaction => (
+                                <li key={transaction.id}>
+                                    日期：{new Date(transaction.transaction_date).toLocaleDateString()} -
+                                    金額：{transaction.borrow_fee}
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>目前沒有可顯示的交易記錄</p>
+                    )}
                 </div>
             )}
 
