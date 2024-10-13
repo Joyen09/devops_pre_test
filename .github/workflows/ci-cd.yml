@@ -78,6 +78,20 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/customer-data-frontend:latest
 
+    - name: Extract package-lock.json
+      run: |
+        docker create --name temp ${{ secrets.DOCKERHUB_USERNAME }}/customer-data-frontend:latest
+        docker cp temp:/app/package-lock.json ./frontend/package-lock.json
+        docker rm temp
+
+    - name: Commit and push package-lock.json
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add frontend/package-lock.json
+        git commit -m "Update package-lock.json [skip ci]" || echo "No changes to commit"
+        git push
+
   deploy-to-k8s:
     needs: docker-build-and-push
     runs-on: ubuntu-latest
