@@ -7,6 +7,8 @@ WORKDIR /app
 # 複製 package.json 和 package-lock.json（如果可用）
 COPY package*.json ./
 
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
 # 安裝項目依賴
 RUN npm install
 
