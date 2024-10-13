@@ -110,9 +110,28 @@ jobs:
 
     - name: Configure KinD
       run: |
-        kind create cluster
-        kubectl cluster-info
-        kubectl get nodes
+        max_retries=3
+        retry_count=0
+        while [ $retry_count -lt $max_retries ]; do
+          if kind get clusters | grep -q kind; then
+            echo "Cluster 'kind' already exists, deleting it"
+            kind delete cluster
+          fi
+          if kind create cluster; then
+            echo "Cluster created successfully"
+            kubectl cluster-info
+            kubectl get nodes
+            break
+          else
+            echo "Failed to create cluster, retrying..."
+            retry_count=$((retry_count+1))
+            sleep 5
+          fi
+        done
+        if [ $retry_count -eq $max_retries ]; then
+          echo "Failed to create cluster after $max_retries attempts"
+          exit 1
+        fi
 
     - name: Deploy to Kubernetes
       run: |
